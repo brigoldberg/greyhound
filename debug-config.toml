@@ -1,0 +1,31 @@
+# Set sources for HDF5 file and ticker list source file
+[data_source]
+hdf5_file = "~/tick_data/ohlc.h5"
+stock_list_file = "~/tick_data/sp10.txt"
+
+# Define columns of interest
+[data_map]
+column_name = 'close'
+
+# Set the log level for all modules
+[logging]
+log_level="debug"
+
+[strategy]
+max_position_risk = 10000
+buy_signal_boundary = 0.9
+sell_signal_boundary = -0.9
+
+[strategy.ema]
+window = 30
+hist_lo = -5
+hist_hi = 5
+buy_trigger = 50
+sell_trigger = 200
+
+[strategy.macd]
+macd_fast = 12
+macd_slow = 26
+macd_sig = 9
+histogram_max = 1
+histogram_min = -1
