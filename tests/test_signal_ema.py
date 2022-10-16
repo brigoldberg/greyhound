@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# test_stock.py
+# test_signal_ema.py
 
 import sys
 import os

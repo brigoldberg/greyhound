@@ -6,7 +6,6 @@ import toml
 from .stock import Stock
 from .utils import iterate_basket, read_config
 from .applogger import get_logger
-locale.setlocale(locale.LC_ALL, 'en_US')
 
 class Universe:
     """
@@ -40,7 +39,8 @@ class Universe:
             # use last date in OHLC if no date_end passed.
             date_end = kwargs.get('date_end', stock_obj.ohlc.index[-1])
 
-            symbol_pnl = stock_obj.get_book_pnl(date_end)
+            #symbol_pnl = stock_obj.get_book_pnl(date_end)
+            symbol_pnl = stock_obj.get_book_pnl()
             universe_pnl = universe_pnl + symbol_pnl
             self.logger.info(f'{symbol} {symbol_pnl}')
 

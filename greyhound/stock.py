@@ -78,23 +78,29 @@ class Stock:
             raise Exception(f'{trade_date} not in time series')
         self.trade_log.loc[trade_date, ['shares', 'trade_price']] = [shares, price]
 
-    def get_book_value(self, trade_date):
+    def get_book_value(self, trade_date=None):
         """ Return dollar value of all shares at specified trade_date """
+        if not trade_date:
+            trade_date = self.ohlc.index[-1]
         shares = self.trade_log['shares'].loc[:trade_date].sum()
         spot_price = self.ohlc[self.col_name].loc[trade_date]
         book_value = shares * spot_price
         self.logger.info(f'{self.symbol.upper()}: book value {shares}@${spot_price} is ${book_value:0.2f}')
         return book_value
 
-    def get_book_cost(self, trade_date):
+    def get_book_cost(self, trade_date=None):
         """ Return cost of all stock purchases up to submitted date """
+        if not trade_date:
+            trade_date = self.ohlc.index[-1]
         total_book_cost = self.trade_log['shares'] * self.trade_log['trade_price']
         book_cost = total_book_cost.loc[:trade_date].sum()
         self.logger.info(f'{self.symbol.upper()}: book cost ${book_cost:0.2f}')
         return book_cost
 
-    def get_book_pnl(self, trade_date, pretty=False):
+    def get_book_pnl(self, trade_date=None, pretty=False):
         """ Return PnL of all trades up to submitted trade date """
+        if not trade_date:
+            trade_date = self.ohlc.index[-1]
         book_pnl = self.get_book_value(trade_date) - self.get_book_cost(trade_date)
         self.logger.info(f'{self.symbol.upper()}: book PnL ${book_pnl:0.2f}')
         return book_pnl
