@@ -5,7 +5,6 @@ import argparse
 import locale
 import multiprocessing as mp
 import sys
-import time
 import os
 
 app_path = os.path.join(os.path.expanduser('~/sandbox/greyhound/'))
