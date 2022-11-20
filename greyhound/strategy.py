@@ -37,7 +37,6 @@ class EMA(Strategy):
         self.signal_df['signal'] = np.where(self.signal_df['hist_norm'] >= (hist_mean * 1.1), -1.0, 0.0)
         self.signal_df['signal'] = np.where(self.signal_df['hist_norm'] <= (hist_mean * 1.1), 1.0, 0.0)
 
-
 class MACD(Strategy):
 
     def __init__(self, stock_object, strategy_name):
@@ -60,12 +59,32 @@ class MACD(Strategy):
         self.signal_df['signal'] = np.where(self.signal_df['histogram'] >= 0.3, -1.0, 0.0)
         self.signal_df['signal'] = np.where(self.signal_df['histogram'] <= -0.3, 1.0, 0.0)
 
+class FastReturn(Strategy):
+
+    def create_factors(self):
+        pass
+
+    def create_singal(self):
+
+        ohlc = self.stock_obj.ohlc
+        yesterday_pct_ret = ohlc['pct_ret'].iloc[0]
+        
+        for trade_date in ohlc.index[1:]:
+
+            if ohlc.loc[trade_date]['pct_ret'] > yesterday_pct_ret:
+                # buy signal
+                pass
+
+            yesterday_pct_ret = ohlc.loc[trade_date]['pct_ret']
+
+
 
 class StrategyFactory:
 
     strategies = {
                 'ema': EMA,
-                'macd': MACD
+                'macd': MACD,
+                'fast-return': FastReturn
             }
 
     def create_strategy(self, stock_obj, name):

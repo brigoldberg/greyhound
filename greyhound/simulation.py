@@ -1,7 +1,6 @@
 # simulation.py
 import locale
 import math
-import toml
 from .utils import read_config
 from .applogger import get_logger
 

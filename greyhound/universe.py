@@ -1,8 +1,4 @@
 # universe.py
-import locale
-import os
-import sys
-import toml
 from .stock import Stock
 from .utils import iterate_basket, read_config
 from .applogger import get_logger

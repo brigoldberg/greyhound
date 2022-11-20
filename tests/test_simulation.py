@@ -3,11 +3,9 @@
 
 import sys
 import os
-import numpy as np
 import pandas as pd
 app_path = os.path.join(os.path.expanduser('~/sandbox/greyhound/'))
 sys.path.append(app_path)
-from greyhound import EMA
 from greyhound import Stock
 from greyhound import Simulation
 
