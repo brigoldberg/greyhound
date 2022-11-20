@@ -147,6 +147,7 @@ log/*
 .idea/*
 
 # VSCode
+.vscode
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
