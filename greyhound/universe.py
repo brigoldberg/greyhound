@@ -3,9 +3,11 @@ from .stock import Stock
 from .utils import iterate_basket, read_config
 from .applogger import get_logger
 
+
 class Universe:
     """
     Create a 'basket'  of Stock object from list of symbols.
+    Load data into dataframe inside stock objects.
     """
     def __init__(self, symbol_list, date_start, date_end, **kwargs):
 
@@ -24,26 +26,32 @@ class Universe:
             self.stocks[symbol] = Stock(symbol, date_start, date_end, config=self.config)
             self.logger.info(f'adding {symbol} to universe')
 
-    @iterate_basket
-    def list_basket(self, stock_obj):
-        print(f'{stock_obj.symbol}')
 
-    def get_basket_pnl(self, **kwargs):
-        universe_pnl = 0
-        for symbol,stock_obj in self.stocks.items():
+    def get_tickers(self):
+        """ Return list of stock tickers in universe """
+        return list(self.stocks.keys())
 
-            # use last date in OHLC if no date_end passed.
-            date_end = kwargs.get('date_end', stock_obj.ohlc.index[-1])
 
-            #symbol_pnl = stock_obj.get_book_pnl(date_end)
-            symbol_pnl = stock_obj.get_book_pnl()
-            universe_pnl = universe_pnl + symbol_pnl
-            self.logger.info(f'{symbol} {symbol_pnl}')
+    def calc_held_share_value(self, trade_date=None):
+        """
+        Calculate value of held shares of all tickers in basket.
+        Return dict of each ticker:pnl.
+        """
+        held_share_value = {}
+        for k,v in self.stocks.items():
+            held_share_value[k] = v.get_held_share_value(trade_date)
 
-        return universe_pnl
+        return held_share_value
 
-    def get_basket_sharpe(self, stock_obj, date_end):
-        pass
 
-    def plot_basket_pnl(self, stock_obj, date_end):
+    def calc_basket_cash_position(self, trade_date=None):
+        
+        cash_pos = {}
+        for k,v in self.stocks.items():
+            cash_pos[k] = v.get_cash_position(trade_date)
+
+        return cash_pos
+
+
+    def calc_basket_pnl(self, trade_date=None):
         pass

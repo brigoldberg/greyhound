@@ -3,7 +3,7 @@
 
 import sys
 import os
-import numpy as np
+from pytest import approx
 app_path = os.path.join(os.path.expanduser('~/sandbox/greyhound/'))
 sys.path.append(app_path)
 from greyhound import Stock
@@ -11,14 +11,27 @@ from greyhound import Stock
 
 symbol = 'spy'
 date_start = '2015-01-01'
-date_end = '2015-12-31'
+date_end = '2015-01-31'
 trades = {
-    '2015-01-02': 250,
-    '2015-08-27': -100,
-    '2015-10-02': 75 }
+    '2015-01-02': 50,
+    '2015-01-07': -50,
+    '2015-01-12': 56,
+    '2015-01-21': -56,
+    '2015-01-27': 56 }
+"""
+DATE        PRICE
+2015-01-02  179.005
+2015-01-07  176.267
+2015-01-12  176.566
+2015-01-21  176.984
+2015-01-27  176.655
+"""
 
 stock = Stock(symbol, date_start, date_end, config='../config.toml')
 
+#------------------------------------#
+#   Stock object unit tests
+#------------------------------------#
 def test_stock_obj_creation():
     """ This tests:
           - Object initialization
@@ -26,29 +39,67 @@ def test_stock_obj_creation():
           - loading OHLC
           - snipping dates
     """
-    assert len(stock.ohlc) == 252 and len(stock.trade_log)
+    assert len(stock.ohlc) == 20 
 
-def test_get_price():
+
+def test_tick_data():
     """ Test fetching stock price from OHLC DF """
-    assert stock.get_price('2015-03-20', col_name='high') == 184.671
+    assert stock.ohlc.loc['2015-01-20']['high'] == 176.636 
+
 
 def test_log_trade():
-    """ Log 3 trades and confirm data exists and is correct. """
+    """ 
+    Log trades and confirm held share count and trade cost
+    is correct.
+    """
     for trade_date, shares in trades.items():
         stock_price = stock.ohlc.loc[trade_date]['close']
         stock.log_trade(trade_date, shares, stock_price)
 
-    assert stock.trade_log.shares.sum() == 225
+    shares = stock.trade_log['shares'].sum()
+    trade_cost_sum = stock.trade_log['trade_cost'].sum() 
 
-def test_get_book_cost():
-    """ Calc cost of purchased stock at date in middle of trade log. """
-    #assert stock.get_book_cost('2015-09-15') == 40600.25
-    assert 27000 < stock.get_book_cost('2015-09-15') < 28000.00
+    assert shares == 56 and trade_cost_sum == approx(-10006, rel=1)
 
-def test_get_book_value():
-    """ Calc total book value at end of year. """
-    assert 40000.00 < stock.get_book_value('2015-12-31') < 42000.00
+def test_get_held_share_value():
+    """
+    Check calculation of the value of held shares at a specific date.
+    """
+    test_result = []
+    test_result.append(stock.get_held_share_value('2015-01-15'))
+    test_result.append(stock.get_held_share_value())
 
-def test_get_book_pnl():
-    """ Test PnL of held positions. """
-    assert  630.00 < stock.get_book_pnl('2015-12-31') <  650.00
+    assert test_result == approx([9731.6, 9711.5], rel=1)
+
+
+def test_get_cash_position():
+    """
+    Check returned cash position.
+    """
+    test_result = []
+    for dt in ['2015-01-15', '2015-01-22']:
+        test_result.append(stock.trade_log.loc[:dt]['trade_cost'].sum())
+
+    assert test_result == approx([-10024.6, -113.5], rel=1)
+
+
+def test_get_max_drawdown():
+    """
+    Check for lowest cash position throughout trading date range
+    """
+    test_result = []
+    for dt in ['2015-01-06', '2015-01-15', '2015-01-22']:
+        test_result.append(stock.get_max_drawdown(dt))
+    
+    assert test_result == approx([-8950, -10025, -10025], rel=1)
+
+
+def test_calc_pnl():
+    """
+    Check PnL of traded symbol at various dates
+    """
+    test_result = []
+    for dt in ['2015-01-02', '2015-01-12', '2015-01-21', '2015-01-30']:
+        test_result.append(stock.calc_pnl(dt))
+
+    assert test_result == approx([0.0, -136.9, -113.5, -274.6], rel=1)

@@ -25,7 +25,7 @@ class Simulation:
 
     def _risk_check(self, signal, trade_date):
 
-        existing_position_risk = self.stock.get_book_value(trade_date)
+        existing_position_risk = self.stock.get_held_share_value(trade_date)
         risk_allowed = self.risk_limit - abs(existing_position_risk)
         self.logger.info(f'{self.stock.symbol.upper()}  Allowed risk: ${locale.format_string("%.2f", risk_allowed)}')
 

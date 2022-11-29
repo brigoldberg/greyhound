@@ -15,26 +15,35 @@ date_end = '2015-12-31'
 
 trades = [ ['nvda', '2015-01-02', 100], ['nvda', '2015-08-27', -50],
            ['spy', '2015-06-16', 200], ['spy', '2015-11-09', -100] ]
+'''
+DATE        TICKER  SHARES  CLOSE
+2015-01-02  nvda    100     4.83778
+2015-06-16  spy     200     184.014
+2015-08-27  nvda    -50     5.50764
+2015-11-09  spy     -100    183.944
+
+2015-06-01  nvda            5.42405
+            spy             185.169
+2015-12-31  nvda            8.0522
+            spy             181.325
+'''
 
 universe = Universe(symbols, date_start, date_end, config='../config.toml')
 
+# Load data
+for trade in trades:
+    ticker, dt, shares = trade
+    price = universe.stocks[ticker].ohlc.loc[dt]['close']
+    universe.stocks[ticker].log_trade(dt, shares, price)
+
 def test_universe_obj_creation():
-    # There should be 252 days in each stock time series.  Sum of all three symbols 
-    # should be 504
+    # There should be 252 days in each stock time series.  Sum of 
+    # both symbols should be 504
     total_days = 0
     for k,v in universe.stocks.items():
         total_days = total_days + len(universe.stocks[k].ohlc)
 
     assert total_days == 504
 
-def test_universe_pnl():
-    # PnL for universe should be -$84.69. This can vary based on when you
-    # pull the OHLC df because of splits, dividend calcs, etc.
-    for trade_log_entry in trades:
-        sym, trade_date, shares_traded = trade_log_entry
-        trade_price = universe.stocks[sym].get_price(trade_date)
-        universe.stocks[sym].log_trade(trade_date, shares_traded, trade_price)
-
-    universe_pnl = universe.get_basket_pnl()
-    assert -84.00 < universe_pnl < -78.00
-
+def test_calc_basket_share_value():
+    pass
