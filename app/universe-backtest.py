@@ -76,6 +76,7 @@ if __name__ == '__main__':
         result = result_queue.get()
         universe.stocks[result.symbol] = result
 
-    print(f'{locale.currency(universe.get_basket_pnl(), grouping=True)}')
-
-
+    for k,v in universe.stocks.items():
+        pnl = locale.currency(v.calc_pnl(), grouping=True)
+        max_draw = locale.currency(v.get_max_drawdown(), grouping=True)
+        print(f"{k} pnl/max-draw: {pnl}/{max_draw}")
