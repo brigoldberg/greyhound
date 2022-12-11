@@ -31,12 +31,12 @@ class Stock:
         # The trade_log holds all transactions and position & PnL is calculated
         # from this data structure.
         self.trade_log = pd.DataFrame(index=[self.ohlc.index[0],], dtype='float64')
-        self.trade_log['shares']      = 0
-        self.trade_log['trade_price'] = 0
-        self.trade_log['trade_cost'] = 0
-        self.trade_log['cash_position'] = 0
-        self.trade_log['share_value'] = 0
-        self.trade_log['book_value'] = 0
+        self.trade_log['shares']      = 0       # shares held
+        self.trade_log['trade_price'] = 0       # price of shares at trade date
+        self.trade_log['trade_cost'] = 0        # total cost of trade
+        self.trade_log['cash_position'] = 0     # cash held at date
+        self.trade_log['share_value'] = 0       # value of shares at date
+        self.trade_log['book_value'] = 0        # cash + share value at date
 
 
     def _read_config(self, kwargs):

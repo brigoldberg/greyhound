@@ -53,5 +53,9 @@ class Universe:
         return cash_pos
 
 
-    def calc_basket_pnl(self, trade_date=None):
-        pass
+    def get_basket_pnl(self, trade_date=None):
+        basket_pnl = {}
+        for k,v in self.stocks.items():
+            basket_pnl[k] = v.calc_pnl()
+
+        return basket_pnl
